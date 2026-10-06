@@ -1,0 +1,16 @@
+{
+  "name": "Tapas Turiya — Practice Tracker",
+  "short_name": "Tapas Turiya",
+  "description": "A daily sādhanā practice tracker — japa, practice, Hanuman Chalisa, Kumbhak Pranayama, Nishkaam Karma and a voice journal, shared across your devices.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F1ECDF",
+  "theme_color": "#F1ECDF",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

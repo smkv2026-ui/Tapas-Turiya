@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sadhana — white lotus with a diamond">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A1330"/>
+      <stop offset="0.55" stop-color="#16328C"/>
+      <stop offset="1" stop-color="#2D6BE4"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="0.5" cy="0.56" r="0.5">
+      <stop offset="0" stop-color="#8FD3FF" stop-opacity="0.55"/>
+      <stop offset="0.45" stop-color="#4E9BFF" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#4E9BFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="petal" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#D9E8FF"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="petalOuter" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#BFD6FA"/>
+      <stop offset="1" stop-color="#F4F8FF"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.5" stop-color="#CFF1FF"/>
+      <stop offset="1" stop-color="#7FD8FF"/>
+    </linearGradient>
+    <path id="p" d="M0,0 C 46,-58 40,-150 0,-212 C -40,-150 -46,-58 0,0 Z"/>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="286" r="210" fill="url(#aura)"/>
+
+  <!-- outer petals -->
+  <g transform="translate(256 380)" stroke="#8DB8F5" stroke-width="3" stroke-linejoin="round">
+    <use href="#p" transform="rotate(-62) scale(0.78)" fill="url(#petalOuter)"/>
+    <use href="#p" transform="rotate(62) scale(0.78)" fill="url(#petalOuter)"/>
+    <use href="#p" transform="rotate(-32) scale(0.92)" fill="url(#petal)"/>
+    <use href="#p" transform="rotate(32) scale(0.92)" fill="url(#petal)"/>
+    <use href="#p" transform="scale(1.08)" fill="url(#petal)"/>
+  </g>
+
+  <!-- petal veins -->
+  <g stroke="#A9C9F7" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.9">
+    <path d="M256 372 L256 176"/>
+  </g>
+
+  <!-- base / water line -->
+  <path d="M150 392 Q256 350 362 392" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.95"/>
+  <path d="M184 414 Q256 392 328 414" fill="none" stroke="#9FD0FF" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- diamond on the top tip -->
+  <g transform="translate(256 132)">
+    <polygon points="0,-34 18,-12 0,14 -18,-12" fill="url(#gem)" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <polyline points="-18,-12 0,-4 18,-12" fill="none" stroke="#5AB8F0" stroke-width="2"/>
+    <line x1="0" y1="-4" x2="0" y2="14" stroke="#5AB8F0" stroke-width="2"/>
+    <g stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.9">
+      <line x1="30" y1="-38" x2="30" y2="-26"/>
+      <line x1="24" y1="-32" x2="36" y2="-32"/>
+    </g>
+  </g>
+</svg>

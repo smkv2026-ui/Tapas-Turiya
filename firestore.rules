@@ -1,0 +1,65 @@
+rules_version = '2';
+
+// Data model
+//   users/{uid}                        -> { email, workspaceId, updatedAt }
+//   workspaces/{code}                  -> { members: [uid, ...], createdAt, createdBy }
+//   workspaces/{code}/kv/{key}         -> { value: <JSON string>, updatedAt }
+//   globalKv/{key}                     -> { value: <JSON string>, updatedAt }
+//
+// A "workspace" is the shared space a household signs into together via an
+// invite code (see js/cloud-store.js). Every profile and tracker log is
+// stored as a kv document under the caller's workspace, so anyone who is a
+// member can read and write them — that's what makes data shared across
+// the household's devices. globalKv holds data meant to be shared across
+// EVERY workspace/account (currently just the Guru's Teachings library),
+// not scoped to any one household.
+//
+// Admin note: `read` on /users/* and on every workspace's /kv/* is granted
+// to ANY signed-in user, not just workspace members. This is intentional
+// — it's what backs the in-app Admin view (password-gated in the UI only,
+// see js/app.js) that lists every account and its profiles' full data.
+// Firestore rules cannot check a password typed into the page, so this is
+// a deliberate, explicit trade-off: any authenticated account can read
+// every other account's profile/tracker/journal data directly via the
+// Firestore SDK, whether or not they know the Admin password or ever open
+// the Admin UI. `write` stays restricted to a user's own account doc and a
+// workspace's own members, so a signed-in stranger can read but can never
+// modify another household's data. See CLAUDE.md "Admin module" for the
+// full rationale — this was an explicit choice, not an oversight.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    match /workspaces/{workspaceId} {
+      // Looking up a single workspace by its exact invite code is required
+      // to join one; enumerating all workspaces is never allowed.
+      allow get: if request.auth != null;
+      allow list: if false;
+
+      allow create: if request.auth != null
+                    && request.resource.data.createdBy == request.auth.uid
+                    && request.resource.data.members == [request.auth.uid];
+
+      allow update: if request.auth != null && (
+                      request.auth.uid in resource.data.members ||
+                      request.resource.data.members == resource.data.members.concat([request.auth.uid])
+                    );
+
+      allow delete: if false;
+
+      match /kv/{key} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null &&
+          request.auth.uid in get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.members;
+      }
+    }
+
+    match /globalKv/{key} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

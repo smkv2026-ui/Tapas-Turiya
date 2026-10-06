@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tapas Turiya — Practice Tracker</title>
+<meta name="description" content="Tapas Turiya — a daily sādhanā tracker with japa, practice, Hanuman Chalisa, Kumbhak Pranayama, Nishkaam Karma and a voice journal.">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#F1ECDF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#070B1A" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tapas Turiya">
+<link rel="icon" href="icons/logo.svg" type="image/svg+xml">
+<link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script>
+  // Apply the last-used (or the system's) theme before first paint, so the
+  // sign-in and profile screens match it too — not just the tracker once a
+  // profile's own saved theme loads.
+  (function(){
+    var t = null;
+    try{ t = localStorage.getItem('sadhana-theme'); }catch(e){}
+    if(t !== 'light' && t !== 'dark') t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Auth screen (sign in / create account) -->
+<div class="user-screen" id="authScreen">
+  <div class="user-screen-inner" style="max-width:380px;">
+    <img class="brand-logo" src="icons/logo.svg" alt="" width="84" height="84">
+    <h1 class="serif">Tapas Turiya</h1>
+    <p class="user-tagline">Guru Kripa hi Kevalam</p>
+
+    <div class="auth-card">
+      <div class="auth-tabbar">
+        <button class="auth-tab active" type="button" data-authtab="login">Sign in</button>
+        <button class="auth-tab" type="button" data-authtab="signup">Create account</button>
+      </div>
+
+      <form class="auth-form" id="loginForm">
+        <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" required>
+        <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password" required>
+        <button class="pill" type="submit" id="loginSubmit">Sign in</button>
+        <button type="button" class="add-link" id="forgotPasswordBtn">Forgot password?</button>
+      </form>
+
+      <form class="auth-form" id="signupForm" style="display:none;">
+        <input type="email" id="signupEmail" placeholder="Email" autocomplete="email" required>
+        <input type="password" id="signupPassword" placeholder="Password (min 6 characters)" autocomplete="new-password" required minlength="6">
+        <div class="check-row" style="margin-bottom:12px; flex-direction:column; align-items:flex-start; gap:8px;">
+          <label><input type="radio" name="wsMode" value="new" id="wsModeNew" checked> Start a new shared space</label>
+          <label><input type="radio" name="wsMode" value="join" id="wsModeJoin"> Join an existing shared space with a code</label>
+        </div>
+        <input type="text" id="joinCodeInput" placeholder="Invite code, e.g. AB12CD" style="display:none; text-transform:uppercase;" maxlength="8">
+        <button class="pill" type="submit" id="signupSubmit">Create account</button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+      <button class="pill ghost" id="googleSignInBtn" type="button" style="width:100%;">Continue with Google</button>
+
+      <div class="auth-error" id="authError" style="display:none;"></div>
+      <div class="auth-status" id="authStatus" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- User select screen -->
+<div class="user-screen" id="userSelectScreen" style="display:none;">
+  <div class="user-screen-inner">
+    <img class="brand-logo" src="icons/logo.svg" alt="" width="84" height="84">
+    <h1 class="serif">Tapas Turiya</h1>
+    <p class="user-tagline">Guru Kripa hi Kevalam</p>
+    <div class="daily-quote-card" id="dailyQuoteCard">
+      <img class="daily-quote-photo" id="dailyQuotePhoto" style="display:none;" alt="">
+      <div class="daily-quote-body">
+        <div class="daily-quote-text" id="dailyQuoteText"></div>
+        <div class="daily-quote-attrib" id="dailyQuoteAttrib"></div>
+      </div>
+    </div>
+    <div class="user-grid" id="userGrid"></div>
+    <div class="add-user-form" id="addUserForm">
+      <input type="text" id="newUserName" placeholder="Enter name" maxlength="24">
+      <div class="form-actions">
+        <button class="pill" id="addUserSave">Add &amp; continue</button>
+        <button class="pill ghost" id="addUserCancel">Cancel</button>
+      </div>
+    </div>
+    <button class="add-link" id="backToAccountBtn" style="margin-top:18px;">Account &amp; shared-space code</button>
+  </div>
+</div>
+
+<div class="wrap" id="appScreen" style="display:none;">
+  <div class="stats-strip" id="statsStrip">
+    <span>🧘 Practice today: <b id="statsPracticeTime">0m</b></span>
+    <span>📿 Japa today: <b id="statsJapaTime">0m</b></span>
+  </div>
+
+  <header class="top">
+    <div class="brand">
+      <img class="brand-mark" src="icons/logo.svg" alt="" width="44" height="44">
+      <div>
+      <h1>Tapas Turiya</h1>
+      <p id="userSubtitle">daily practice tracker</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="switchUserBtn" title="Switch user">⇄</button>
+      <button class="icon-btn" id="accountBtn" title="Account &amp; shared-space code">⚙</button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">◐</button>
+      <button class="icon-btn" id="exportBtn" title="Export all data">↓</button>
+      <button class="icon-btn" id="importBtn" title="Import all data">↑</button>
+      <input type="file" id="importFileInput" accept="application/json" style="display:none;">
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="today"><span class="tab-ico">☀️</span>Today</button>
+    <button class="tab-btn" data-tab="routine"><span class="tab-ico">🕰️</span>Routine</button>
+    <button class="tab-btn" data-tab="journal"><span class="tab-ico">📔</span>Journal</button>
+    <button class="tab-btn" data-tab="calendar"><span class="tab-ico">📅</span>Calendar</button>
+    <button class="tab-btn" data-tab="gurus"><span class="tab-ico">🪷</span>Guru's Teachings</button>
+    <button class="tab-btn" data-tab="chalisa"><span class="tab-ico">🚩</span>Hanuman Chalisa</button>
+    <button class="tab-btn" data-tab="kumbhak"><span class="tab-ico">🫁</span>Kumbhak Pranayama</button>
+    <button class="tab-btn" data-tab="nishkaam"><span class="tab-ico">🪔</span>Nishkaam Karma</button>
+  </div>
+
+  <div id="tab-today">
+    <!-- Japa -->
+    <section class="habit-section">
+      <div class="sec-head">
+        <div>
+          <h2>Japa</h2>
+          <div class="desc">Counters by sandhyā, tap a session to count full screen</div>
+        </div>
+        <button class="add-link" data-open="japaForm">+ add counter</button>
+      </div>
+      <div class="add-form" id="japaForm">
+        <input type="hidden" id="japaEditId" value="">
+        <input type="text" id="japaName" placeholder="Counter name, e.g. Hare Krishna mala">
+        <label class="sandhya-toggle-row"><input type="checkbox" id="japaSandhyaApplicable" checked> Sandhyā applicable?</label>
+        <div class="check-row" id="japaSandhyaRow">
+          <label><input type="checkbox" value="morning"> Morning sandhyā</label>
+          <label><input type="checkbox" value="afternoon"> Afternoon sandhyā</label>
+          <label><input type="checkbox" value="evening"> Evening sandhyā</label>
+        </div>
+        <div class="form-actions">
+          <button class="pill" id="japaSave">Save</button>
+          <button class="pill ghost" data-close="japaForm">Cancel</button>
+        </div>
+      </div>
+      <div id="japaList"></div>
+    </section>
+
+    <!-- Practice -->
+    <section class="habit-section">
+      <div class="sec-head">
+        <div>
+          <h2>Practice</h2>
+          <div class="desc">Timed sessions by sandhyā</div>
+        </div>
+        <button class="add-link" data-open="practiceForm">+ add practice</button>
+      </div>
+      <div class="add-form" id="practiceForm">
+        <input type="hidden" id="practiceEditId" value="">
+        <input type="text" id="practiceName" placeholder="Practice name, e.g. Study of scripture">
+        <label class="sandhya-toggle-row"><input type="checkbox" id="practiceSandhyaApplicable" checked> Sandhyā applicable?</label>
+        <div class="check-row" id="practiceSandhyaRow">
+          <label><input type="checkbox" value="morning"> Morning sandhyā</label>
+          <label><input type="checkbox" value="afternoon"> Afternoon sandhyā</label>
+          <label><input type="checkbox" value="evening"> Evening sandhyā</label>
+        </div>
+        <div class="form-actions">
+          <button class="pill" id="practiceSave">Save</button>
+          <button class="pill ghost" data-close="practiceForm">Cancel</button>
+        </div>
+      </div>
+      <div id="practiceList"></div>
+    </section>
+
+    <!-- Reading -->
+    <section class="habit-section">
+      <div class="sec-head">
+        <div>
+          <h2>Reading</h2>
+          <div class="desc">Log pages read each day</div>
+        </div>
+        <button class="add-link" data-open="bookForm">+ add book</button>
+      </div>
+      <div class="add-form" id="bookForm">
+        <input type="text" id="bookTitle" placeholder="Book title">
+        <input type="number" id="bookPages" placeholder="Total number of pages" min="1">
+        <div class="form-actions">
+          <button class="pill" id="bookSave">Save</button>
+          <button class="pill ghost" data-close="bookForm">Cancel</button>
+        </div>
+      </div>
+      <div id="readingList"></div>
+    </section>
+
+    <!-- Learning -->
+    <section class="habit-section">
+      <div class="sec-head">
+        <div>
+          <h2>Learning</h2>
+          <div class="desc">Milestones, checkpoints and notes</div>
+        </div>
+        <button class="add-link" data-open="learnForm">+ add track</button>
+      </div>
+      <div class="add-form" id="learnForm">
+        <input type="text" id="learnTitle" placeholder="What are you learning?">
+        <div class="form-actions">
+          <button class="pill" id="learnSave">Save</button>
+          <button class="pill ghost" data-close="learnForm">Cancel</button>
+        </div>
+      </div>
+      <div id="learningList"></div>
+    </section>
+
+    <!-- Today's Schedule: custom activities from the Routine Scheduler due today -->
+    <section class="habit-section" id="todayScheduleSection">
+      <div class="sec-head">
+        <div>
+          <h2>Today's Schedule</h2>
+          <div class="desc">From your Routine Scheduler, in addition to the mandatory practices above</div>
+        </div>
+        <button class="add-link" id="todayAddActivityLink">+ add activity</button>
+      </div>
+      <div id="todayCompletionBanner" style="display:none;"></div>
+      <div id="todayScheduleList"></div>
+      <div id="todayFlexibleWrap" style="margin-top:14px; display:none;">
+        <div class="item-sub" style="margin-bottom:6px;">Flexible today</div>
+        <div id="todayFlexibleList"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="tab-routine" style="display:none;">
+    <!-- Filled in by renderRoutineTab() in js/app.js -->
+  </div>
+
+  <div id="tab-journal" style="display:none;">
+    <!-- Filled in by renderJournalTab() in js/app.js -->
+  </div>
+
+  <div id="tab-calendar" style="display:none;">
+    <div id="calDashboard"></div>
+
+    <div class="cal-controls">
+      <div class="cal-tabbar" id="calTypeTabs">
+        <button class="cal-tab on" data-type="all">All</button>
+        <button class="cal-tab" data-type="japa">Japa</button>
+        <button class="cal-tab" data-type="practice">Practice</button>
+        <button class="cal-tab" data-type="reading">Reading</button>
+        <button class="cal-tab" data-type="learning">Learning</button>
+      </div>
+      <input class="cal-search" id="calSearch" placeholder="Search an activity, e.g. Gita or Hare Krishna">
+      <button class="cal-reset-btn" id="calReset">Reset</button>
+    </div>
+
+    <div class="cal-progresswrap">
+      <div class="cal-progresslabel"><span>This month's consistency</span><b id="calProgressCount">0 / 0 active days</b></div>
+      <div class="cal-progressbar"><i id="calProgressFill" style="width:0%"></i></div>
+    </div>
+
+    <div class="cal-legend2">
+      <span><i style="background:var(--gold)"></i>Japa</span>
+      <span><i style="background:var(--sage)"></i>Practice</span>
+      <span><i style="background:var(--accent-soft)"></i>Reading</span>
+      <span><i style="background:var(--rust)"></i>Learning</span>
+    </div>
+
+    <div class="cal-nav">
+      <button id="calPrev">‹</button>
+      <h3 id="calMonthLabel"></h3>
+      <button id="calNext">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-tip">Click any block to trace that activity across the month · click "+n more" to see the full day.</div>
+    <div class="day-panel" id="dayPanel" style="display:none;"></div>
+  </div>
+
+  <div id="tab-gurus" style="display:none;">
+    <div class="gurus-content">
+      <div class="sec-head">
+        <div>
+          <h2>Guru's Teachings</h2>
+          <div class="desc">Shared with every user of this tracker · sequence, search &amp; upload</div>
+        </div>
+      </div>
+
+      <div class="guru-add-panel">
+        <div class="row-flex" style="margin-bottom:10px;">
+          <span class="item-title" style="font-size:13.5px;">Upload a set (CSV template)</span>
+        </div>
+        <div class="guru-row-actions" style="margin-bottom:12px;">
+          <button class="pill ghost" id="gurusTemplateBtn">Download template</button>
+          <input type="file" id="gurusCsvInput" accept=".csv,text/csv" style="display:none;">
+          <button class="pill ghost" id="gurusCsvBtn">Upload CSV</button>
+          <span class="file-mini">Columns: Guru's Name, Teaching</span>
+        </div>
+        <div class="row-flex" style="margin-bottom:10px;">
+          <span class="item-title" style="font-size:13.5px;">Or add one teaching</span>
+        </div>
+        <input type="text" id="guruNameInput" placeholder="Guru's name">
+        <textarea id="guruTeachingInput" placeholder="Teaching / quote"></textarea>
+        <div class="guru-row-actions">
+          <button class="pill" id="guruAddSave">Save teaching</button>
+          <input type="file" id="guruImageInput" accept="image/*" style="display:none;">
+          <button class="pill ghost" id="guruImageBtn">Add/change this Guru's picture</button>
+        </div>
+      </div>
+
+      <div class="guru-tabbar" id="guruTabbar"></div>
+      <div class="gurus-toolbar">
+        <input type="text" id="gurusSearch" placeholder="Search teachings, e.g. a keyword or phrase">
+      </div>
+      <div id="guruTeachingsList"></div>
+    </div>
+  </div>
+
+  <div id="tab-chalisa" style="display:none;"></div>
+  <div id="tab-kumbhak" style="display:none;"></div>
+  <div id="tab-nishkaam" style="display:none;"></div>
+</div>
+
+<!-- Fullscreen Japa Counter -->
+<div class="fullscreen" id="japaFullscreen">
+  <div class="fs-bg" id="fsBg"></div>
+  <div class="fs-scrim"></div>
+  <div class="fs-tap-area" id="fsTapArea"></div>
+  <div class="fs-top">
+    <div class="fs-timer" id="fsTimer">0:00</div>
+    <div style="display:flex;gap:8px;">
+      <button class="fs-close" id="fsImageBtn" title="Attach / change background image">🖼</button>
+      <button class="fs-close" id="fsClose">✕</button>
+    </div>
+  </div>
+  <div class="fs-name" id="fsName"></div>
+  <div class="fs-bottom">
+    <div class="fs-count-small" id="fsCount">0</div>
+    <div class="fs-tap-hint">tap anywhere to count</div>
+    <div class="fs-controls">
+      <button id="fsMinus">−1</button>
+      <button id="fsReset">Reset</button>
+      <button id="fsImageRemove" style="display:none;">Remove image</button>
+    </div>
+  </div>
+</div>
+<input type="file" accept="image/*" class="fs-img-input" id="japaImageInput">
+
+<!-- Account & shared-space modal -->
+<div class="fullscreen" id="accountModal">
+  <div class="account-panel">
+    <h3 class="serif" style="margin:0 0 14px;">Account &amp; shared space</h3>
+    <div class="item-sub" style="margin-bottom:4px;">Signed in as</div>
+    <div class="item-title" id="accountEmail" style="margin-bottom:14px;"></div>
+    <div class="item-sub" style="margin-bottom:4px;">Shared-space invite code</div>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+      <code class="cal-time" id="workspaceCodeText" style="font-size:15px; padding:6px 10px;"></code>
+      <button class="pill ghost" id="copyWorkspaceCodeBtn" type="button">Copy</button>
+    </div>
+    <div class="empty-note" style="margin-bottom:18px;">Share this code with family members — signing up with it lands their account on this same shared data.</div>
+
+    <div class="item-sub" style="margin-bottom:4px;">Switch to a different shared space</div>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+      <input type="text" id="switchWorkspaceInput" placeholder="Enter a code" maxlength="8" style="text-transform:uppercase; flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius); background:var(--bg); color:var(--ink); font-family:'Inter'; font-size:13px;">
+      <button class="pill ghost" id="switchWorkspaceBtn" type="button">Join</button>
+    </div>
+    <div class="empty-note" id="switchWorkspaceNote" style="margin-bottom:18px;">Moves this account to another shared space's data.</div>
+
+    <div class="form-actions">
+      <button class="pill ghost" id="signOutBtn" type="button">Sign out</button>
+      <button class="pill ghost" id="accountCloseBtn" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin dashboard: every account created on the app. No separate
+     login UI — signing in on the ordinary form above with username
+     "admin" / password "SriGuruBabaJi" opens this instead (see
+     js/auth-ui.js and "Admin module" in CLAUDE.md). -->
+<div class="user-screen" id="adminScreen" style="display:none; align-items:flex-start;">
+  <div class="user-screen-inner" style="max-width:960px; text-align:left;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <div>
+        <h1 class="serif" style="margin:0;">Admin</h1>
+        <p class="user-tagline" style="margin:4px 0 0;">Every account created on this app</p>
+      </div>
+      <button class="pill ghost" id="adminExitBtn" type="button">Exit Admin</button>
+    </div>
+    <div class="admin-layout">
+      <div class="admin-account-list" id="adminAccountList"></div>
+      <div class="admin-account-detail" id="adminAccountDetail">
+        <div class="empty-note">Select an account on the left to view its profiles.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Add Activity button -->
+<button class="fab" id="addActivityFab" title="Add Activity" aria-label="Add Activity" style="display:none;">+</button>
+
+<!-- Add / Edit Activity panel -->
+<div class="fullscreen sheet-overlay" id="activityPanel">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h3 class="serif" id="activityPanelTitle">Add Activity</h3>
+      <button class="fs-close sheet-close" id="activityPanelClose" type="button">✕</button>
+    </div>
+
+    <div class="auth-tabbar" id="activityModeTabs" style="margin-bottom:14px;">
+      <button class="auth-tab active" type="button" data-mode="quick">Quick Add</button>
+      <button class="auth-tab" type="button" data-mode="detailed">Detailed</button>
+    </div>
+
+    <div class="suggestion-chips" id="activitySuggestions"></div>
+
+    <form id="activityForm">
+      <input type="hidden" id="actEditId" value="">
+      <input type="text" id="actName" placeholder="Activity name, e.g. Exercise" required>
+
+      <div id="actDetailedFields" style="display:none;">
+        <textarea id="actDescription" class="act-textarea" placeholder="Optional description"></textarea>
+
+        <div class="field-row">
+          <div class="field-col" style="max-width:80px;">
+            <label class="field-label">Icon</label>
+            <input type="text" id="actIcon" maxlength="4" placeholder="🏃" style="text-align:center;">
+          </div>
+          <div class="field-col">
+            <label class="field-label">Category</label>
+            <select id="actCategory"></select>
+          </div>
+          <div class="field-col">
+            <label class="field-label">Priority</label>
+            <select id="actPriority">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="field-label">Accent color</label>
+        <div class="color-swatches" id="actColorSwatches"></div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-col">
+          <label class="field-label">Start time</label>
+          <input type="time" id="actStartTime">
+        </div>
+        <div class="field-col">
+          <label class="field-label">Duration (minutes)</label>
+          <input type="number" id="actDuration" min="5" step="5" value="30">
+        </div>
+      </div>
+      <div class="empty-note" style="margin:-6px 0 12px;">Leave start time blank to keep this as a flexible task for today.</div>
+
+      <div class="field-col" style="margin-bottom:12px;">
+        <label class="field-label">Daily reminder (optional)</label>
+        <div class="reminder-control">
+          <span class="reminder-icon">🔔</span>
+          <input type="time" id="actReminder">
+          <button type="button" class="pill ghost reminder-clear-btn" id="actReminderClear">Clear</button>
+        </div>
+        <div class="empty-note" style="margin-top:4px;">Best-effort browser notification — see Settings for how this works.</div>
+      </div>
+
+      <div id="actFrequencyFields" style="display:none;">
+        <label class="field-label">Repeat</label>
+        <div class="check-row" style="margin-bottom:8px; flex-direction:column; align-items:flex-start; gap:6px;">
+          <label><input type="radio" name="actFreq" value="daily" checked> Every day</label>
+          <label><input type="radio" name="actFreq" value="weekdays"> Weekdays only</label>
+          <label><input type="radio" name="actFreq" value="weekends"> Weekends only</label>
+          <label><input type="radio" name="actFreq" value="custom"> Custom days</label>
+        </div>
+        <div class="day-picker" id="actDayPicker" style="display:none;"></div>
+      </div>
+
+      <div class="form-actions" style="flex-wrap:wrap;">
+        <button class="pill" type="submit" id="actSave">Add to Routine</button>
+        <button class="pill ghost" type="button" id="actCancel">Cancel</button>
+        <button class="pill ghost" type="button" id="actDuplicate" style="display:none;">Duplicate</button>
+        <button class="pill ghost" type="button" id="actDelete" style="display:none;">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="module" src="js/firebase-init.js"></script>
+<script type="module" src="js/auth-ui.js"></script>
+<script type="module" src="js/app.js"></script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('service-worker.js').catch(e=>console.error('SW registration failed', e));
+    });
+  }
+</script>
+</body>
+</html>
