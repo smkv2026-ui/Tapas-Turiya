@@ -5,6 +5,7 @@ import {
 } from "./cloud-store.js";
 import { auth } from "./firebase-init.js";
 import { initJournal, renderJournalTab, openJournalNoteFor, stopJournalRecording } from "./journal.js";
+import { initDhyana, renderDhyana, stopDhyana } from "./dhyana.js";
 import { initChalisa, renderChalisaTab, stopChalisa } from "./chalisa.js";
 import { initKumbhak, renderKumbhakTab, resetKumbhak } from "./kumbhak.js";
 import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
@@ -35,6 +36,8 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
       nishkaam:[],
       // Kumbhak Pranayama sessions: [{id, date, ts, unit, rounds, seconds}] (js/kumbhak.js)
       kumbhak:[],
+      // Dhyana Insights: [{id, ts, date, title, notes, audio}] (js/dhyana.js)
+      dhyana:[],
       kumbhakUnit:5
     };
   }
@@ -60,6 +63,7 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     if(!d.journal || typeof d.journal !== 'object') d.journal = {};
     if(!Array.isArray(d.nishkaam)) d.nishkaam = [];
     if(!Array.isArray(d.kumbhak)) d.kumbhak = [];
+    if(!Array.isArray(d.dhyana)) d.dhyana = [];
     if(!d.kumbhakUnit) d.kumbhakUnit = 5;
     return d;
   }
@@ -416,6 +420,7 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     finalizeAllRunning();
     clearAllReminderTimers();
     stopJournalRecording();
+    stopDhyana();
     stopChalisa();
     resetKumbhak();
     document.getElementById('appScreen').style.display='none';
@@ -464,6 +469,7 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     finalizeAllRunning();
     clearAllReminderTimers();
     stopJournalRecording();
+    stopDhyana();
     stopChalisa();
     resetKumbhak();
     users = [];
@@ -517,6 +523,7 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     cloudGet, cloudSet, getCurrentUser: ()=>currentUser
   };
   initJournal(appCtx);
+  initDhyana(appCtx);
   initChalisa(appCtx);
   initKumbhak(appCtx);
   initNishkaam(appCtx);
@@ -3150,6 +3157,7 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     renderPractice();
     renderReading();
     renderLearning();
+    renderDhyana();
     renderTodaySchedule();
     renderStatsStrip();
   }
@@ -3341,7 +3349,9 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
     }).join('');
     const nk = (d.nishkaam||[]).map(n=>`<div>${n.status==='done'?'✅':'🗓️'} ${escapeHtml(n.text)} <span class="empty-note">· ${escapeHtml(n.date||'')}</span></div>`).join('') || '<div class="empty-note">None.</div>';
     const km = (d.kumbhak||[]).slice().reverse().map(s=>`<div>${escapeHtml(s.date)} — ${s.rounds} round${s.rounds===1?'':'s'} (1 : 4 : 2 : 2, unit ${s.unit}s)</div>`).join('') || '<div class="empty-note">None.</div>';
+    const dh = (d.dhyana||[]).slice().reverse().map(x=>`<div><b>${escapeHtml(x.title||'Untitled')}</b>${x.audio?' 🎙️':''} <span class="empty-note">· ${escapeHtml(x.date||'')}</span>${x.notes?'<div>'+escapeHtml(x.notes)+'</div>':''}</div>`).join('') || '<div class="empty-note">None.</div>';
     return `<div class="journal-section"><div class="journal-section-title">📔 Journal (${dates.length} ${dates.length===1?'day':'days'})</div>${jHtml}</div>
+      <div class="journal-section"><div class="journal-section-title">🧘 Dhyana Insights</div>${dh}</div>
       <div class="journal-section"><div class="journal-section-title">🪔 Nishkaam Karma</div>${nk}</div>
       <div class="journal-section"><div class="journal-section-title">🫁 Kumbhak Pranayama</div>${km}</div>`;
   }

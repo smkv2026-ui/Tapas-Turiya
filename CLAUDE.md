@@ -10,6 +10,8 @@ js/app.js             Core tracker: profiles, japa, practice, reading, learning,
                       routine scheduler, calendar, gurus, reminders, admin,
                       export/import, tab switching
 js/journal.js         Simple journal + voice notes (MediaRecorder)
+js/dhyana.js          Dhyana Insights (Today tab): titled voice recording + notes;
+                      audio in IndexedDB on-device, small clips also synced
 js/chalisa.js         Hanuman Chalisa player; audio blobs in IndexedDB
 js/kumbhak.js         1:4:2:2 breathing timer, synthesised temple bell
 js/nishkaam.js        Nishkaam Karma log (done / planned)

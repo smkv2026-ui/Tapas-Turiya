@@ -1292,3 +1292,23 @@
   html[data-theme="dark"] .ch-btn-main,
   html[data-theme="dark"] .nk-check{ color:#1B1410; }
   html[data-theme="dark"] .nk-item.done .nk-check{ color:#1B1410; }
+
+  /* ---------- Dhyana Insights (Today) ---------- */
+  .dh-composer{
+    border:1px solid var(--line); border-radius:var(--radius-lg); background:var(--bg-raised);
+    padding:14px; box-shadow:var(--shadow-sm); margin-bottom:14px; display:flex; flex-direction:column; gap:10px;
+  }
+  .dh-composer input[type=text]{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--bg); color:var(--ink); font:14px 'Inter',sans-serif;
+  }
+  .dh-composer .jr-actions{ margin-top:2px; }
+  .dh-item{
+    border:1px solid var(--line); border-left:3px solid var(--gold); border-radius:var(--radius);
+    background:var(--bg-raised); padding:12px 14px; margin-bottom:10px; box-shadow:var(--shadow-sm);
+  }
+  .dh-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .dh-title{ font:600 15px 'Fraunces',serif; word-break:break-word; }
+  .dh-tools{ display:flex; gap:2px; flex-shrink:0; }
+  .dh-meta{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .dh-notes{ margin-top:8px; font-size:13.5px; line-height:1.55; white-space:pre-wrap; word-break:break-word; }
