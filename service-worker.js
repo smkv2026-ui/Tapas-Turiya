@@ -4,7 +4,7 @@
 // this app ships new features frequently — always prefers a fresh network
 // copy over the cached one when online (see the fetch handler below), only
 // falling back to cache when there's no network at all.
-const CACHE_VERSION = 'tapas-turiya-v2';
+const CACHE_VERSION = 'tapas-turiya-v3';
 const PRECACHE_URLS = [
   './',
   './index.html',

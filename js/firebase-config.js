@@ -8,11 +8,11 @@
 //   Firebase Console → Project settings → General → Your apps → SDK setup and configuration
 // See README.md for the full setup walkthrough.
 export const firebaseConfig = {
-  apiKey: "AIzaSyB8L_Aogv3n949HkeOIx8nfu2K-wacnaEg",
-  authDomain: "msadhanatracker.firebaseapp.com",
-  projectId: "msadhanatracker",
-  storageBucket: "msadhanatracker.firebasestorage.app",
-  messagingSenderId: "622722453113",
-  appId: "1:622722453113:web:728cae2ce37a6cf3214ea8",
-  measurementId: "G-9778JP8EZT"
+  apiKey: "AIzaSyAsSqD3p09aYYyC21DTEwpg9ADVZ5Ot2r0",
+  authDomain: "tapas-turiya.firebaseapp.com",
+  projectId: "tapas-turiya",
+  storageBucket: "tapas-turiya.firebasestorage.app",
+  messagingSenderId: "780990670431",
+  appId: "1:780990670431:web:dfd4a5d833833c1db09dea",
+  measurementId: "G-T6G3HNC03K"
 };
