@@ -1,46 +1,46 @@
   :root{
-    --bg:#F1ECDF;
-    --bg-raised:#FBF8F1;
-    --ink:#26241D;
-    --ink-soft:#5C584A;
-    --line:#DBD3BF;
-    --accent:#33415C;
-    --accent-soft:#5C6E93;
-    --gold:#B8863B;
-    --gold-soft:#E4CB99;
-    --sage:#66805A;
-    --rust:#A2543A;
-    --shadow: 0 4px 12px rgba(38,36,29,0.06);
-    --shadow-sm: 0 2px 6px rgba(38,36,29,0.06);
-    --shadow-md: 0 8px 22px rgba(38,36,29,0.10);
-    --shadow-lg: 0 16px 40px rgba(38,36,29,0.16);
+    /* Palette drawn from the Hanuman logo: sandalwood cream, copper-gold, charcoal-brown */
+    --bg:#F3E7D3;
+    --bg-raised:#FCF6E9;
+    --ink:#2B1F18;
+    --ink-soft:#6E5645;
+    --line:#E2CDAA;
+    --accent:#6B3F20;
+    --accent-soft:#A8693A;
+    --gold:#B8741F;
+    --gold-soft:#EBCB9A;
+    --sage:#6F7F4E;
+    --rust:#A8472E;
+    --shadow: 0 4px 12px rgba(60,35,15,0.08);
+    --shadow-sm: 0 2px 6px rgba(60,35,15,0.07);
+    --shadow-md: 0 8px 22px rgba(60,35,15,0.12);
+    --shadow-lg: 0 16px 40px rgba(60,35,15,0.18);
     --ease: cubic-bezier(0.16,1,0.3,1);
     --radius: 8px;
     --radius-lg: 16px;
-    /* "ether" — a luminous sky-blue accent layered over the warm base palette */
-    --ether:#2F6FEB;
-    --ether-2:#7A5CFA;
-    --ether-soft:rgba(47,111,235,0.10);
-    --ether-glow:rgba(47,111,235,0.28);
+    /* "ether" — the primary highlight, now a saffron-copper glow */
+    --ether:#B5651D;
+    --ether-2:#8A4B22;
+    --ether-soft:rgba(181,101,29,0.11);
+    --ether-glow:rgba(181,101,29,0.30);
   }
-  /* Dark mode: a deep "cosmic ether" night-blue rather than the original warm
-     brown, so the ether accent glows against it; gold stays as the warm note. */
+  /* Dark mode: the charcoal-brown of the logo's backing plate, with copper-gold glowing against it. */
   html[data-theme="dark"]{
-    --bg:#070B1A;
-    --bg-raised:#0F1631;
-    --ink:#E9EEFB;
-    --ink-soft:#9DAACB;
-    --line:#233157;
-    --accent:#86A8FF;
-    --accent-soft:#5E7FD9;
-    --gold:#E8BB6C;
-    --gold-soft:#3F3520;
-    --sage:#7FCBA2;
-    --rust:#F28E70;
-    --ether:#6FB6FF;
-    --ether-2:#9C8CFF;
-    --ether-soft:rgba(111,182,255,0.12);
-    --ether-glow:rgba(111,182,255,0.35);
+    --bg:#1B1410;
+    --bg-raised:#2A1F18;
+    --ink:#F6E7CF;
+    --ink-soft:#BDA384;
+    --line:#4B3727;
+    --accent:#E8A45E;
+    --accent-soft:#C98B4B;
+    --gold:#EBAA5C;
+    --gold-soft:#4A3720;
+    --sage:#A3B87E;
+    --rust:#EE8A68;
+    --ether:#E49F5E;
+    --ether-2:#C26A2C;
+    --ether-soft:rgba(228,159,94,0.13);
+    --ether-glow:rgba(228,159,94,0.36);
     --shadow: 0 4px 16px rgba(0,0,0,0.4);
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
     --shadow-md: 0 10px 26px rgba(0,0,0,0.45);
@@ -1002,14 +1002,14 @@
     background:
       radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.55), transparent 60%),
       radial-gradient(1px 1px at 28% 72%, rgba(255,255,255,.45), transparent 60%),
-      radial-gradient(1.5px 1.5px at 44% 34%, rgba(190,220,255,.5), transparent 60%),
+      radial-gradient(1.5px 1.5px at 44% 34%, rgba(255,214,160,.5), transparent 60%),
       radial-gradient(1px 1px at 63% 12%, rgba(255,255,255,.4), transparent 60%),
-      radial-gradient(1.5px 1.5px at 78% 58%, rgba(190,220,255,.5), transparent 60%),
+      radial-gradient(1.5px 1.5px at 78% 58%, rgba(255,214,160,.5), transparent 60%),
       radial-gradient(1px 1px at 88% 26%, rgba(255,255,255,.45), transparent 60%),
       radial-gradient(1px 1px at 8% 88%, rgba(255,255,255,.35), transparent 60%),
-      radial-gradient(1.5px 1.5px at 55% 90%, rgba(190,220,255,.4), transparent 60%),
-      radial-gradient(60% 40% at 70% 20%, rgba(111,182,255,.10), transparent 70%),
-      radial-gradient(50% 40% at 20% 80%, rgba(156,140,255,.09), transparent 70%);
+      radial-gradient(1.5px 1.5px at 55% 90%, rgba(255,214,160,.4), transparent 60%),
+      radial-gradient(60% 40% at 70% 20%, rgba(228,159,94,.10), transparent 70%),
+      radial-gradient(50% 40% at 20% 80%, rgba(194,106,44,.09), transparent 70%);
     animation:etherDrift 60s ease-in-out infinite alternate;
   }
   @keyframes etherDrift{ from{ transform:translate3d(0,0,0); } to{ transform:translate3d(-2.5%, 2%, 0); } }
@@ -1126,28 +1126,28 @@
   .ch-player{
     text-align:center; padding:22px 18px 18px; border-radius:var(--radius-lg); border:1px solid var(--line);
     background:
-      radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, #E8782B 22%, transparent), transparent 70%),
+      radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--ether) 22%, transparent), transparent 70%),
       var(--bg-raised);
     box-shadow:var(--shadow-md);
   }
   .ch-art{
     width:112px; height:112px; margin:0 auto 12px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background:conic-gradient(from 0deg, #E8782B, var(--gold), #F6C25B, #E8782B);
-    box-shadow:0 8px 26px color-mix(in srgb, #E8782B 45%, transparent);
+    background:conic-gradient(from 0deg, var(--ether), var(--gold), #F6C25B, var(--ether));
+    box-shadow:0 8px 26px color-mix(in srgb, var(--ether) 45%, transparent);
   }
   .ch-art.spinning{ animation:chSpin 14s linear infinite; }
   @keyframes chSpin{ to{ transform:rotate(360deg); } }
-  .ch-om{ width:92px; height:92px; border-radius:50%; background:var(--bg-raised); color:#E8782B; font-size:44px; display:flex; align-items:center; justify-content:center; }
+  .ch-om{ width:92px; height:92px; border-radius:50%; background:var(--bg-raised); color:var(--ether); font-size:44px; display:flex; align-items:center; justify-content:center; }
   .ch-art.spinning .ch-om{ animation:chSpin 14s linear infinite reverse; }
   .ch-now{ font:600 18px 'Fraunces',serif; margin-bottom:2px; word-break:break-word; }
   .ch-plays{ font-size:12px; color:var(--ink-soft); min-height:18px; margin-bottom:12px; }
   .ch-seek{
     -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:99px; outline-offset:6px;
-    background:linear-gradient(90deg, #E8782B var(--p,0%), var(--line) var(--p,0%)); cursor:pointer;
+    background:linear-gradient(90deg, var(--ether) var(--p,0%), var(--line) var(--p,0%)); cursor:pointer;
   }
-  .ch-seek::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:#E8782B; border:2px solid var(--bg-raised); box-shadow:0 1px 4px rgba(0,0,0,.3); }
-  .ch-seek::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:#E8782B; border:2px solid var(--bg-raised); }
+  .ch-seek::-webkit-slider-thumb{ -webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--ether); border:2px solid var(--bg-raised); box-shadow:0 1px 4px rgba(0,0,0,.3); }
+  .ch-seek::-moz-range-thumb{ width:14px; height:14px; border-radius:50%; background:var(--ether); border:2px solid var(--bg-raised); }
   .ch-times{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--ink-soft); font-variant-numeric:tabular-nums; margin:6px 0 10px; }
   .ch-controls{ display:flex; align-items:center; justify-content:center; gap:10px; }
   .ch-btn{
@@ -1157,7 +1157,7 @@
   }
   .ch-btn:hover:not(:disabled){ transform:translateY(-2px); border-color:var(--gold); }
   .ch-btn:disabled{ opacity:.4; cursor:default; }
-  .ch-btn-main{ width:64px; height:64px; font-size:26px; border:none; color:#fff; background:linear-gradient(135deg,#E8782B,#C9561A); box-shadow:0 8px 20px color-mix(in srgb,#E8782B 45%, transparent); }
+  .ch-btn-main{ width:64px; height:64px; font-size:26px; border:none; color:#fff; background:linear-gradient(135deg,var(--ether),var(--ether-2)); box-shadow:0 8px 20px color-mix(in srgb,var(--ether) 45%, transparent); }
   #chMode{ width:auto; border-radius:14px; padding:6px 10px; flex-direction:column; font-size:17px; line-height:1.1; }
   #chMode small{ font-size:9.5px; color:var(--ink-soft); font-weight:600; }
   .ch-btn-spacer{ width:0; }
@@ -1165,14 +1165,14 @@
     display:flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:var(--radius);
     background:var(--bg-raised); margin-bottom:8px; box-shadow:var(--shadow-sm); transition:border-color .2s ease;
   }
-  .ch-track.playing{ border-color:#E8782B; background:color-mix(in srgb, #E8782B 8%, var(--bg-raised)); }
+  .ch-track.playing{ border-color:var(--ether); background:color-mix(in srgb, var(--ether) 9%, var(--bg-raised)); }
   .ch-track-main{ flex:1; min-width:0; display:flex; align-items:center; gap:12px; background:none; border:none; color:var(--ink); cursor:pointer; padding:11px 8px 11px 12px; text-align:left; font-family:'Inter'; }
   .ch-track-num{ width:26px; text-align:center; font-weight:700; color:var(--ink-soft); font-size:13px; }
-  .ch-track.playing .ch-track-num{ color:#E8782B; }
+  .ch-track.playing .ch-track-num{ color:var(--ether); }
   .ch-track-name{ flex:1; min-width:0; font-weight:600; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ch-track-name small{ display:block; font-weight:400; color:var(--ink-soft); font-size:11.5px; }
   .ch-eq{ display:inline-flex; align-items:flex-end; gap:2px; height:14px; }
-  .ch-eq i{ width:3px; background:#E8782B; border-radius:2px; animation:chEq .9s ease-in-out infinite; }
+  .ch-eq i{ width:3px; background:var(--ether); border-radius:2px; animation:chEq .9s ease-in-out infinite; }
   .ch-eq i:nth-child(2){ animation-delay:.2s; } .ch-eq i:nth-child(3){ animation-delay:.4s; }
   @keyframes chEq{ 0%,100%{ height:4px; } 50%{ height:14px; } }
 
@@ -1282,3 +1282,13 @@
   .nk-meta{ font-size:11.5px; color:var(--ink-soft); margin-top:4px; }
   .nk-item.overdue .nk-meta{ color:var(--rust); font-weight:600; }
   .nk-tools{ display:flex; gap:2px; flex-shrink:0; }
+
+  /* Dark mode: highlight fills are light copper, so their text must be dark */
+  html[data-theme="dark"] .tab-btn.active,
+  html[data-theme="dark"] .cal-tab.on,
+  html[data-theme="dark"] .guru-tab.active,
+  html[data-theme="dark"] .day-chip:has(input:checked),
+  html[data-theme="dark"] .snap-btn.on,
+  html[data-theme="dark"] .ch-btn-main,
+  html[data-theme="dark"] .nk-check{ color:#1B1410; }
+  html[data-theme="dark"] .nk-item.done .nk-check{ color:#1B1410; }

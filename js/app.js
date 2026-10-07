@@ -1234,9 +1234,9 @@ import { initNishkaam, renderNishkaamTab } from "./nishkaam.js";
   const ACTIVITY_CATEGORIES = [
     {key:'spiritual', label:'Spiritual', color:'#B8863B'},
     {key:'health',    label:'Health',    color:'#66805A'},
-    {key:'work',      label:'Work',      color:'#33415C'},
+    {key:'work',      label:'Work',      color:'#6B4A33'},
     {key:'learning',  label:'Learning',  color:'#A2543A'},
-    {key:'personal',  label:'Personal',  color:'#5C6E93'},
+    {key:'personal',  label:'Personal',  color:'#A07C58'},
     {key:'other',     label:'Other',     color:'#8A8370'}
   ];
   const ACTIVITY_PRIORITY_ORDER = { high:0, medium:1, low:2 };
