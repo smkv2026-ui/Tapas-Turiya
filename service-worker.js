@@ -4,7 +4,7 @@
 // this app ships new features frequently — always prefers a fresh network
 // copy over the cached one when online (see the fetch handler below), only
 // falling back to cache when there's no network at all.
-const CACHE_VERSION = 'tapas-turiya-v6';
+const CACHE_VERSION = 'tapas-turiya-v7';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -48,6 +48,8 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
+  // Audio seeking uses Range requests (206 responses can't be cached) — let the network handle them.
+  if (req.headers.has('range')) return;
 
   const url = new URL(req.url);
   // Only manage same-origin app-shell requests; let Firebase/Firestore and

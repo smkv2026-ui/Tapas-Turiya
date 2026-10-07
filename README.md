@@ -8,7 +8,7 @@ reminders, shared-space sign-in, export/import, Admin) and adds:
 | Tab | What it does |
 |---|---|
 | **Journal** | A simpler journal: type an entry or tap 🎙️ to record a voice note. Entries are saved per day and searchable. The 📝 icons next to japa/practice/books/activities pre-fill a note. |
-| **Hanuman Chalisa** | Add your own audio files and play them on repeat (repeat one / repeat all / off), with seek, next/prev and lock-screen controls. |
+| **Hanuman Chalisa** | Comes with Krishna Das's Hanuman Chalisa built in; add your own audio files too. Plays on repeat (repeat one / repeat all / off) with a 0.5×–2× speed control (pitch preserved), seek, next/prev and lock-screen controls. |
 | **Kumbhak Pranayama** | Choose the length of "1" (e.g. 5 s) and breathe 1 : 4 : 2 : 2 (5 · 20 · 10 · 10 s). A temple bell marks each phase change; press **Done** to see how many rounds you completed. Sessions are logged. |
 | **Nishkaam Karma** | Record selfless acts you have done, or plan to do; tick planned ones off when done. |
 

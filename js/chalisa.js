@@ -7,6 +7,16 @@ import { toast, fmtClock } from "./ui.js";
 
 const DB_NAME = 'tapas-turiya-chalisa';
 const STORE = 'tracks';
+// Bundled with the app, so there is always something to play. Not stored in
+// IndexedDB and not removable.
+const BUILTIN = {
+  id: 'builtin-krishna-das',
+  name: 'Hanuman Chalisa — Krishna Das',
+  sub: 'Kakrighat, India · September 2009',
+  url: 'assets/hanuman-chalisa-krishna-das.mp3',
+  builtin: true
+};
+const SPEEDS = [0.75, 1, 1.25, 1.5];
 const MODES = [
   { key:'one', label:'Repeat one', ico:'🔂' },
   { key:'all', label:'Repeat all', ico:'🔁' },
@@ -17,10 +27,11 @@ let ctx = null;
 let tracks = [];            // [{id, name, size, type, added}] — blobs stay in IndexedDB
 let currentId = null;
 let mode = 'one';
+let speed = 1;              // playback rate, 0.5–2
 let plays = 0;              // completed playthroughs this session
 let objectUrl = null;
 const audio = new Audio();
-audio.preload = 'auto';
+audio.preload = 'metadata';
 
 const esc = s => ctx.escapeHtml(s == null ? '' : String(s));
 const root = () => document.getElementById('tab-chalisa');
@@ -29,6 +40,9 @@ export function initChalisa(c){
   ctx = c;
   try{ mode = localStorage.getItem('tt-chalisa-mode') || 'one'; }catch(e){ /* private mode */ }
   if(!MODES.some(m=>m.key===mode)) mode = 'one';
+  try{ speed = clampSpeed(parseFloat(localStorage.getItem('tt-chalisa-speed'))); }catch(e){ /* private mode */ }
+  audio.preservesPitch = true;     // slowing down / speeding up keeps the voice natural
+  audio.addEventListener('loadedmetadata', applySpeed);
   audio.addEventListener('ended', onEnded);
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('loadedmetadata', updateProgress);
@@ -87,9 +101,13 @@ export async function renderChalisaTab(){
     document.getElementById('chFileInput').addEventListener('change', onFiles);
   }
   if(!loaded){
-    try{ tracks = (await dbAll()).map(({blob, ...meta})=>meta).sort((a,b)=>a.added-b.added); loaded = true; }
-    catch(e){ console.error(e); toast('Could not open local storage for audio files.'); }
+    try{ tracks = [BUILTIN, ...(await dbAll()).map(({blob, ...meta})=>meta).sort((a,b)=>a.added-b.added)]; loaded = true; }
+    catch(e){
+      console.error(e); toast('Could not open local storage for audio files.');
+      tracks = [BUILTIN]; loaded = true;
+    }
   }
+  if(!currentId) selectTrack(BUILTIN);     // ready to play, but never auto-plays
   renderList();
   renderPlayer();
 }
@@ -113,7 +131,6 @@ async function onFiles(ev){
   if(added){
     toast(added === 1 ? 'Audio added 🙏' : `${added} audio files added 🙏`);
     renderList();
-    if(!currentId) await playTrack(tracks[0].id, false);
   }
 }
 
@@ -123,16 +140,16 @@ function renderList(){
   const el = document.getElementById('chList');
   if(!el) return;
   if(!tracks.length){
-    el.innerHTML = '<div class="ch-empty"><div class="ch-empty-ico">🚩</div>No recordings yet.<br>Tap <b>Add audio files</b> to bring in your Hanuman Chalisa.</div>';
+    el.innerHTML = '';
     return;
   }
   el.innerHTML = tracks.map((t, i)=>`
     <div class="ch-track${t.id===currentId?' playing':''}" data-id="${esc(t.id)}">
       <button class="ch-track-main" type="button" data-play="${esc(t.id)}">
         <span class="ch-track-num">${t.id===currentId && !audio.paused ? '<span class="ch-eq"><i></i><i></i><i></i></span>' : i+1}</span>
-        <span class="ch-track-name">${esc(t.name)}<small>${fmtSize(t.size)}</small></span>
+        <span class="ch-track-name">${esc(t.name)}<small>${t.builtin ? esc(t.sub) : fmtSize(t.size)}</small></span>
       </button>
-      <button class="edit-icon-btn" type="button" data-del="${esc(t.id)}" title="Remove" aria-label="Remove ${esc(t.name)}">🗑</button>
+      ${t.builtin ? '<span class="ch-builtin" title="Included with the app">Default</span>' : `<button class="edit-icon-btn" type="button" data-del="${esc(t.id)}" title="Remove" aria-label="Remove ${esc(t.name)}">🗑</button>`}
     </div>`).join('');
   el.querySelectorAll('[data-play]').forEach(b=> b.addEventListener('click', ()=>{
     const id = b.dataset.play;
@@ -158,6 +175,11 @@ function renderPlayer(){
       <button class="ch-btn ch-btn-main" id="chPlay" type="button" aria-label="Play or pause" ${tracks.length?'':'disabled'}>▶</button>
       <button class="ch-btn" id="chNext" type="button" aria-label="Next">⏭</button>
       <span class="ch-btn-spacer"></span>
+    </div>
+    <div class="ch-speed">
+      <div class="ch-speed-top"><span>Speed</span><b id="chSpeedVal">${speed.toFixed(2)}×</b></div>
+      <input type="range" class="ch-seek" id="chSpeed" min="0.5" max="2" step="0.05" value="${speed}" aria-label="Playback speed">
+      <div class="km-chips ch-speed-chips">${SPEEDS.map(v=>`<button type="button" class="km-chip${v===speed?' on':''}" data-speed="${v}">${v}×</button>`).join('')}</div>
     </div>`;
   document.getElementById('chPlay').addEventListener('click', ()=>{
     if(!currentId && tracks.length) playTrack(tracks[0].id, true); else togglePlay();
@@ -170,8 +192,12 @@ function renderPlayer(){
     audio.loop = mode === 'one';
     renderPlayer();
   });
+  const speedEl = document.getElementById('chSpeed');
+  speedEl.addEventListener('input', ()=> setSpeed(parseFloat(speedEl.value)));
+  document.querySelectorAll('#chPlayer [data-speed]').forEach(b=> b.addEventListener('click', ()=> setSpeed(parseFloat(b.dataset.speed))));
   const seek = document.getElementById('chSeek');
   seek.addEventListener('input', ()=>{ if(audio.duration) audio.currentTime = audio.duration * seek.value / 1000; });
+  setSpeed(speed);
   updateProgress();
   refreshPlayState();
 }
@@ -194,17 +220,47 @@ function refreshPlayState(){
   renderList();
 }
 
+/* ---------- speed ---------- */
+function clampSpeed(v){ return isFinite(v) ? Math.min(2, Math.max(0.5, Math.round(v*20)/20)) : 1; }
+function applySpeed(){
+  audio.defaultPlaybackRate = speed;   // survives a change of source
+  audio.playbackRate = speed;
+}
+function setSpeed(v){
+  speed = clampSpeed(v);
+  try{ localStorage.setItem('tt-chalisa-speed', String(speed)); }catch(e){ /* private mode */ }
+  applySpeed();
+  const val = document.getElementById('chSpeedVal'); if(val) val.textContent = speed.toFixed(2) + '×';
+  const sl = document.getElementById('chSpeed'); if(sl){ sl.value = speed; sl.style.setProperty('--p', ((speed-0.5)/1.5*100) + '%'); }
+  document.querySelectorAll('#chPlayer [data-speed]').forEach(b=> b.classList.toggle('on', parseFloat(b.dataset.speed) === speed));
+}
+
 /* ---------- playback ---------- */
-async function playTrack(id, autoplay){
-  let rec;
-  try{ rec = await dbGet(id); }catch(e){ console.error(e); }
-  if(!rec){ toast('That file could not be found.'); return; }
-  if(objectUrl) URL.revokeObjectURL(objectUrl);
-  objectUrl = URL.createObjectURL(rec.blob);
-  currentId = id;
-  audio.src = objectUrl;
+// Point the player at the bundled track without starting it.
+function selectTrack(t){
+  currentId = t.id;
+  audio.src = t.url;
   audio.loop = mode === 'one';
-  setMediaSession(rec.name);
+  applySpeed();
+  setMediaSession(t.name);
+}
+
+async function playTrack(id, autoplay){
+  if(id === BUILTIN.id){
+    if(objectUrl){ URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    selectTrack(BUILTIN);
+  }else{
+    let rec;
+    try{ rec = await dbGet(id); }catch(e){ console.error(e); }
+    if(!rec){ toast('That file could not be found.'); return; }
+    if(objectUrl) URL.revokeObjectURL(objectUrl);
+    objectUrl = URL.createObjectURL(rec.blob);
+    currentId = id;
+    audio.src = objectUrl;
+    audio.loop = mode === 'one';
+    applySpeed();
+    setMediaSession(rec.name);
+  }
   renderPlayer();
   renderList();
   if(autoplay){
@@ -256,7 +312,7 @@ function setMediaSession(title){
 
 async function removeTrack(id){
   const t = tracks.find(x=>x.id===id);
-  if(!t || !confirm(`Remove “${t.name}” from this device?`)) return;
+  if(!t || t.builtin || !confirm(`Remove “${t.name}” from this device?`)) return;
   if(id === currentId){
     audio.pause(); audio.removeAttribute('src'); audio.load();
     if(objectUrl){ URL.revokeObjectURL(objectUrl); objectUrl = null; }
