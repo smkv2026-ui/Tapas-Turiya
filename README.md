@@ -30,6 +30,20 @@ Firestore for sync.
    or deploy to GitHub Pages (workflow included, runs on pushes to `main`) or
    Firebase Hosting.
 
+## Custom URL (Firebase Hosting)
+
+Besides GitHub Pages, the app can be served at **https://tapas-turiya.web.app**
+(also https://tapas-turiya.firebaseapp.com). From a clone of this repo:
+
+```bash
+npm install -g firebase-tools
+firebase login
+firebase deploy --only hosting
+```
+
+`.firebaserc` already points at the `tapas-turiya` project. Those two domains
+are authorised for sign-in automatically.
+
 ## Notes
 
 - **Voice notes** are stored in Firestore (one document each, ~4 minute cap
